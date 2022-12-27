@@ -1,165 +1,184 @@
-import random
-import pandas as pd
-import numpy as np
-import openpyxl
-import os
-
-def dice(number):
-    throws = [random.randint(1, 6) for i in range(number)]
-    # throws = list(())
-    # for i in range(number):
-    #    a = random.randint(1,6)
-    #    throws.append(a)
-    # print(throws)
-    return throws
-
-def tablename(name):
-    path = r"C:\Users\\arong\OneDrive\Dokumente\Desktop\Python\Risikotabellen" '\\'
-    ending = '.xlsx'
-    result = path + name + ending
-    return result
+import pygame
+from pygame.locals import *
+import time
 
 
-class Attack:
+class Snake:
+    def __init__(self, parent_screen):
+        self.parent_screen = parent_screen
+        self.block = pygame.image.load('ressources/schlangenkopf-sticker.jpg').convert()
+        self.headup = pygame.image.load('ressources/snake_graphics/headup.png').convert()
+        self.headdown = pygame.image.load('ressources/snake_graphics/headdown.png').convert()
+        self.headright = pygame.image.load('ressources/snake_graphics/headright.png').convert()
+        self.headleft = pygame.image.load('ressources/snake_graphics/headleft.png').convert()
+        self.upright = pygame.image.load('ressources/snake_graphics/upright.png').convert()
+        self.upleft = pygame.image.load('ressources/snake_graphics/upleft.png').convert()
+        self.downright = pygame.image.load('ressources/snake_graphics/downright.png').convert()
+        self.downleft = pygame.image.load('ressources/snake_graphics/downleft.png').convert()
+        self.vertical = pygame.image.load('ressources/snake_graphics/vertical.png').convert()
+        self.horizontal = pygame.image.load('ressources/snake_graphics/horizontal.png').convert()
+        self.endup = pygame.image.load('ressources/snake_graphics/endup.png').convert()
+        self.enddown = pygame.image.load('ressources/snake_graphics/enddown.png').convert()
+        self.endright = pygame.image.load('ressources/snake_graphics/endright.png').convert()
+        self.endleft = pygame.image.load('ressources/snake_graphics/endleft.png').convert()
+        self.x = 330
+        self.y = 330
+        self.direction = 'right'
+        self.snake_length = 10
+        self.snake_x = [330]
+        self.snake_y = [330]
 
-    def __init__(self, attack_armys, defend_armys, attarmys, defarmys,  rounds):
-        self.attack_armys = attack_armys
-        self.defend_armys = defend_armys
-        self.attarmys = attarmys
-        self.defarmys = defarmys
-        self.rounds = rounds
+    def draw_head(self):
+        if self.direction == 'up':
+            self.parent_screen.blit(self.headup, (self.x, self.y))
+        if self.direction == 'down':
+            self.parent_screen.blit(self.headdown, (self.x, self.y))
+        if self.direction == 'right':
+            self.parent_screen.blit(self.headright, (self.x, self.y))
+        if self.direction == 'left':
+            self.parent_screen.blit(self.headleft, (self.x, self.y))
 
-    def store_variables(self): # Restore the variables self.attack_armys and self.defend_armys after every fight
-        self.attack_armys = self.attarmys
-        self.defend_armys = self.defarmys
+    def draw_body(self):
+        slen = self.snake_length
+        for i in range(0, slen - 1):
+            if self.snake_x[i-1] > self.snake_x[i]:
+                if self.snake_x[i+1] < self.snake_x[i]:
+                    self.parent_screen.blit(self.horizontal, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_y[i+1] > self.snake_y[i]:
+                    self.parent_screen.blit(self.downright, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_y[i+1] < self.snake_y[i]:
+                    self.parent_screen.blit(self.upright, (self.snake_x[i], self.snake_y[i]))
+            if self.snake_x[i-1] < self.snake_x[i]:
+                if self.snake_x[i+1] > self.snake_x[i]:
+                    self.parent_screen.blit(self.horizontal, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_y[i+1] > self.snake_y[i]:
+                    self.parent_screen.blit(self.downleft, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_y[i+1] < self.snake_y[i]:
+                    self.parent_screen.blit(self.upleft, (self.snake_x[i], self.snake_y[i]))
+            if self.snake_y[i-1] > self.snake_y[i]:
+                if self.snake_y[i+1] < self.snake_y[i]:
+                    self.parent_screen.blit(self.vertical, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_x[i+1] > self.snake_x[i]:
+                    self.parent_screen.blit(self.downright, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_x[i+1] < self.snake_x[i]:
+                    self.parent_screen.blit(self.downleft, (self.snake_x[i], self.snake_y[i]))
+            if self.snake_y[i-1] < self.snake_y[i]:
+                if self.snake_y[i+1] > self.snake_y[i]:
+                    self.parent_screen.blit(self.vertical, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_x[i+1] > self.snake_x[i]:
+                    self.parent_screen.blit(self.upright, (self.snake_x[i], self.snake_y[i]))
+                if self.snake_x[i+1] < self.snake_x[i]:
+                    self.parent_screen.blit(self.upleft, (self.snake_x[i], self.snake_y[i]))
+        if slen > 1:
+            if self.snake_x[slen - 2] > self.snake_x[slen - 1]:
+                self.parent_screen.blit(self.endright, (self.snake_x[slen - 1], self.snake_y[slen - 1]))
+            if self.snake_x[slen - 2] < self.snake_x[slen - 1]:
+                self.parent_screen.blit(self.endleft, (self.snake_x[slen - 1], self.snake_y[slen - 1]))
+            if self.snake_y[slen - 2] > self.snake_y[slen - 1]:
+                self.parent_screen.blit(self.enddown, (self.snake_x[slen - 1], self.snake_y[slen - 1]))
+            if self.snake_y[slen - 2] < self.snake_y[slen - 1]:
+                self.parent_screen.blit(self.endup, (self.snake_x[slen - 1], self.snake_y[slen - 1]))
 
-    def round(self): # One throw of both parties + comparison of the results
+    def draw(self):
+        self.parent_screen.fill((52, 117, 54))
+        for i in range(self.snake_length - len(self.snake_x)):
+            self.snake_x.append(0)
+            self.snake_y.append(0)
+        for i in range(self.snake_length - 1, 0, -1):
+            self.snake_x[i] = self.snake_x[i-1]
+            self.snake_y[i] = self.snake_y[i-1]
+        self.snake_x[0] = self.x
+        self.snake_y[0] = self.y
+        self.draw_body()
+        self.draw_head()
+        pygame.display.flip()
 
-        if self.attack_armys >= 3: # Set attacker throws
-            attack_throws = 3
-        else:
-            attack_throws = self.attack_armys
+    def check_collision(self):
+        for i in range(1, self.snake_length):
+            if self.snake_length > 1:
+                if self.x == self.snake_x[i] and self.y == self.snake_y[i]:
+                    return True
+            if self.snake_x[0] > 990 or self.x < 0 or self.y > 660 or self.y < 0:
+                return True
 
-        attack_result = dice(attack_throws) # attack random dice#
+    def move_up(self):
+        self.y -= 55
+        self.draw()
 
-        # print('a', attack_throws, attack_result)
+    def move_down(self):
+        self.y += 55
+        self.draw()
 
-        if self.defend_armys >= 2: # Set defender throws
-            defend_throws = 2
-        else:
-            defend_throws = 1
+    def move_right(self):
+        self.x += 55
+        self.draw()
 
-        defend_result = dice(defend_throws) # defend random dice
+    def move_left(self):
+        self.x -= 55
+        self.draw()
 
-        # print('d', defend_throws, defend_result)
-
-        attack_result.sort(reverse=True)
-        defend_result.sort(reverse=True)
-
-        if len(defend_result) < len(attack_result): # Set x for result comparison
-            x = len(defend_result) - 1
-        else:
-            x = len(attack_result) - 1
-
-        while x >= 0: # Compare results and kill Armies
-
-            if attack_result[x] > defend_result[x]:
-                self.defend_armys -= 1
-            else:
-                self.attack_armys -=1
-
-            x -= 1
-
-
-    def show(self):
-
-        print(f'Attacker has {self.attack_armys} armys and defender has {self.defend_armys} armys')
-
-
-    def fight(self):
-
-        # print(f'The attacker attacks with {self.attack_armys} and the defender defends with {self.defend_armys} armys')
-
-        rounds = 0
-        self.store_variables()
-
-        while self.defend_armys > 0 and self.attack_armys > 0:
-            self.round()
-            rounds += 1
-
-        if self.attack_armys == 0:
-            return 0
-        elif self.defend_armys == 0:
-            return 1
-
-        print(self.attack_armys, self.defend_armys)
-
-        # print(f'The attacker has left {self.attack_armys} and the defender has left {self.defend_armys} armys \nIt took {rounds} rounds')
-
-
-    def multi_round(self):
-
-        rounds_won = 0
-        rounds_lost = 0
+    def walk(self):
+        if self.direction == 'down':
+            self.move_down()
+            col = self.check_collision()
+            if not col:
+                time.sleep(0.3)
+            return col
+        if self.direction == 'up':
+            self.move_up()
+            col = self.check_collision()
+            if not col:
+                time.sleep(0.3)
+            return col
+        if self.direction == 'right':
+            self.move_right()
+            col = self.check_collision()
+            if not col:
+                time.sleep(0.3)
+            return col
+        if self.direction == 'left':
+            self.move_left()
+            col = self.check_collision()
+            if not col:
+                time.sleep(0.3)
+            return col
 
 
-        for i in range(1, self.rounds + 1):
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.surface = pygame.display.set_mode((1045, 715))
+        self.snake = Snake(self.surface)
+        self.snake.draw()
+        self.col = False
 
-            # print(i)
+    def run(self):
+        running = True
 
-            a = self.fight()
+        while running:
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        running = False
+                    if event.key == K_RETURN:
+                        self.snake.snake_length += 1
+
+                    if event.key == K_UP:
+                        self.snake.direction = 'up'
+                    elif event.key == K_DOWN:
+                        self.snake.direction = 'down'
+                    elif event.key == K_LEFT:
+                        self.snake.direction = 'left'
+                    elif event.key == K_RIGHT:
+                        self.snake.direction = 'right'
+
+                if event.type == QUIT:
+                    running = False
+            self.col = self.snake.walk()
+            if self.col:
+                running = False
 
 
-            if a == 1:
-                rounds_won +=1
-            if a == 0:
-                rounds_lost += 1
-
-            # print('round over')
-
-        return rounds_won, rounds_lost
-
-'''
-x = int(input('How many attack armys? '))
-y = int(input('How many defend armys? '))
-z = int(input('And how many rounds? '))
-
-a = Attack(x, y, x, y, z)
-
-prob = a.multi_round()[0] / z * 100
-round_prob = round(prob, 2)
-
-print(f'Your probability of winning against {y} defending armies with {x} attacking armies is {round_prob}%')
-
-
-
-'''
-x = int(input('How many attacking armies should I try out? '))
-y = int(input('How many defending armies should I try out? '))
-z = int(input('How many simulations per scenario? '))
-
-probtable = dict()
-
-for i in range(1, x+1):
-    probtable[i] = []
-    for j in range(1, y+1):
-        a = Attack(i, j, i, j, z)
-        probtable[i].append(round(a.multi_round()[0] / z * 100, 2))
-
-df = pd.DataFrame(probtable, index=range(1, y+1))
-
-print(df)
-
-t = 1
-while t == 1:
-    export = input('Do you want your table to be made an excel file? ')
-    if export == 'yes':
-        uname = input('Enter the file name: ')
-        path = tablename(uname)
-        df.to_excel(path)
-        t = 0
-    elif export == 'no':
-        break
-    else:
-        print('Please enter \"yes\" or \"no\".')
-
+if __name__ == '__main__':
+    game = Game()
+    game.run()
