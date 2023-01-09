@@ -7,21 +7,21 @@ import random
 class Snake:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
-        self.block = pygame.image.load('ressources/schlangenkopf-sticker.jpg').convert_alpha()
-        self.headup = pygame.image.load('ressources/snake_graphics/headup.png').convert_alpha()
-        self.headdown = pygame.image.load('ressources/snake_graphics/headdown.png').convert_alpha()
-        self.headright = pygame.image.load('ressources/snake_graphics/headright.png').convert_alpha()
-        self.headleft = pygame.image.load('ressources/snake_graphics/headleft.png').convert_alpha()
-        self.upright = pygame.image.load('ressources/snake_graphics/upright.png').convert_alpha()
-        self.upleft = pygame.image.load('ressources/snake_graphics/upleft.png').convert_alpha()
-        self.downright = pygame.image.load('ressources/snake_graphics/downright.png').convert_alpha()
-        self.downleft = pygame.image.load('ressources/snake_graphics/downleft.png').convert_alpha()
-        self.vertical = pygame.image.load('ressources/snake_graphics/vertical.png').convert_alpha()
-        self.horizontal = pygame.image.load('ressources/snake_graphics/horizontal.png').convert_alpha()
-        self.endup = pygame.image.load('ressources/snake_graphics/endup.png').convert_alpha()
-        self.enddown = pygame.image.load('ressources/snake_graphics/enddown.png').convert_alpha()
-        self.endright = pygame.image.load('ressources/snake_graphics/endright.png').convert_alpha()
-        self.endleft = pygame.image.load('ressources/snake_graphics/endleft.png').convert_alpha()
+        self.block = pygame.image.load('../ressources/schlangenkopf-sticker.jpg').convert_alpha()
+        self.headup = pygame.image.load('../ressources/snake_graphics/headup.png').convert_alpha()
+        self.headdown = pygame.image.load('../ressources/snake_graphics/headdown.png').convert_alpha()
+        self.headright = pygame.image.load('../ressources/snake_graphics/headright.png').convert_alpha()
+        self.headleft = pygame.image.load('../ressources/snake_graphics/headleft.png').convert_alpha()
+        self.upright = pygame.image.load('../ressources/snake_graphics/upright.png').convert_alpha()
+        self.upleft = pygame.image.load('../ressources/snake_graphics/upleft.png').convert_alpha()
+        self.downright = pygame.image.load('../ressources/snake_graphics/downright.png').convert_alpha()
+        self.downleft = pygame.image.load('../ressources/snake_graphics/downleft.png').convert_alpha()
+        self.vertical = pygame.image.load('../ressources/snake_graphics/vertical.png').convert_alpha()
+        self.horizontal = pygame.image.load('../ressources/snake_graphics/horizontal.png').convert_alpha()
+        self.endup = pygame.image.load('../ressources/snake_graphics/endup.png').convert_alpha()
+        self.enddown = pygame.image.load('../ressources/snake_graphics/enddown.png').convert_alpha()
+        self.endright = pygame.image.load('../ressources/snake_graphics/endright.png').convert_alpha()
+        self.endleft = pygame.image.load('../ressources/snake_graphics/endleft.png').convert_alpha()
         self.x = 330
         self.y = 330
         self.direction = 'right'
@@ -132,7 +132,7 @@ class Apple:
         self.parent_screen = parent_screen
         self.x = 110
         self.y = 110
-        self.image = pygame.image.load('ressources/snake_graphics/apple.png').convert_alpha()
+        self.image = pygame.image.load('../ressources/snake_graphics/apple.png').convert_alpha()
 
     def draw(self):
         self.parent_screen.fill((52, 117, 54))
@@ -185,6 +185,7 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.game_lost = True
+                        print(event, type(event))
                     if event.key == K_RETURN:
                         self.snake.snake_length += 1
 
@@ -197,7 +198,25 @@ class Game:
                     elif event.key == K_RIGHT and not self.snake.direction == 'left':
                         self.snake.direction = 'right'
 
+                if event.type == QUIT:
+                    self.game_lost = True
+
                 # Speeding up the snake
+            keys = pygame.key.get_pressed()
+            elif keys[pygame.K_LEFT] and self.snake.direction == 'left':
+                self.speed = 0.1
+            elif keys[pygame.K_RIGHT] and self.snake.direction == 'right':
+                self.speed = 0.1
+            else:
+                self.speed = 0.3
+
+            if self.play():
+                self.game_lost = True
+
+            time.sleep(self.speed)
+        self.game_over()
+        time.sleep(5)
+''' 
                     if event.key == K_UP and self.snake.direction == 'up':
                         self.speed = 0.1
                     if event.key == K_DOWN and self.snake.direction == 'down':
@@ -217,16 +236,14 @@ class Game:
                         self.speed = 0.3
                     if event.key == K_RIGHT and self.snake.direction == 'right':
                         self.speed = 0.3
+'''
 
-                if event.type == QUIT:
-                    self.game_lost = True
 
-            if self.play():
-                self.game_lost = True
-            time.sleep(self.speed)
 
-        self.game_over()
-        time.sleep(5)
+
+
+
+
 
 
 
